@@ -565,18 +565,63 @@ def plot_function_summary_subplot(ax_left, ax_right, original_inputs, original_o
         ax_left.set_ylabel('t-SNE 2', fontsize=9)
         plt.colorbar(scatter, ax=ax_left, label='Output', shrink=0.8)
     
-    ax_left.set_title(f'{function_name} ({n_dims}D)', fontsize=10)
+    ax_left.set_title(f'{function_name} ({n_dims}D) - with BO', fontsize=10)
     ax_left.grid(True, alpha=0.3)
     
-    # Right plot: Output distribution
-    ax_right.hist(original_outputs, bins=min(10, len(original_outputs)), 
-                 edgecolor='black', alpha=0.7, label='Original')
-    ax_right.axvline(new_output, color='red', linestyle='--', linewidth=2, 
-                    label=f'Week 1: {new_output:.2e}' if abs(new_output) < 0.01 
-                    else f'Week 1: {new_output:.4f}')
-    ax_right.set_xlabel('Output', fontsize=9)
-    ax_right.set_ylabel('Freq', fontsize=9)
-    ax_right.set_title('Distribution', fontsize=10)
-    ax_right.legend(fontsize=7)
+    # Right plot: Same visualization WITHOUT BO point (matching individual plot)
+    if n_dims == 2:
+        # 2D scatter plot without BO
+        scatter_right = ax_right.scatter(original_inputs[:, 0], original_inputs[:, 1], 
+                                        c=original_outputs, cmap='viridis', 
+                                        s=80, alpha=0.7, edgecolors='black', 
+                                        linewidth=1.5, vmin=vmin, vmax=vmax)
+        # Week 1 point (colored by output)
+        ax_right.scatter(new_input[0], new_input[1], s=150, 
+                       c=[new_output], cmap='viridis', alpha=0.9, 
+                       edgecolors='black', linewidth=2, marker='*', 
+                       zorder=5, vmin=vmin, vmax=vmax)
+        ax_right.set_xlabel('x1', fontsize=9)
+        ax_right.set_ylabel('x2', fontsize=9)
+        plt.colorbar(scatter_right, ax=ax_right, label='Output', shrink=0.8)
+    elif n_dims == 3:
+        # t-SNE without BO point (matching individual plot)
+        combined_inputs_no_bo = np.vstack([original_inputs, new_input.reshape(1, -1)])
+        tsne_no_bo = TSNE(n_components=2, random_state=random_state, 
+                         perplexity=min(30, len(combined_inputs_no_bo)-1))
+        inputs_2d_no_bo = tsne_no_bo.fit_transform(combined_inputs_no_bo)
+        
+        scatter_right = ax_right.scatter(inputs_2d_no_bo[:-1, 0], inputs_2d_no_bo[:-1, 1], 
+                                        c=original_outputs, cmap='viridis', 
+                                        s=80, alpha=0.7, edgecolors='black', 
+                                        linewidth=1.5, vmin=vmin, vmax=vmax)
+        # Week 1 point (colored by output)
+        ax_right.scatter(inputs_2d_no_bo[-1, 0], inputs_2d_no_bo[-1, 1], s=150, 
+                       c=[new_output], cmap='viridis', alpha=0.9, 
+                       edgecolors='black', linewidth=2, marker='*', 
+                       zorder=5, vmin=vmin, vmax=vmax)
+        ax_right.set_xlabel('t-SNE 1', fontsize=9)
+        ax_right.set_ylabel('t-SNE 2', fontsize=9)
+        plt.colorbar(scatter_right, ax=ax_right, label='Output', shrink=0.8)
+    else:
+        # t-SNE for higher dimensions without BO point (matching individual plot)
+        combined_inputs_no_bo = np.vstack([original_inputs, new_input.reshape(1, -1)])
+        tsne_no_bo = TSNE(n_components=2, random_state=random_state, 
+                         perplexity=min(30, len(combined_inputs_no_bo)-1))
+        inputs_2d_no_bo = tsne_no_bo.fit_transform(combined_inputs_no_bo)
+        
+        scatter_right = ax_right.scatter(inputs_2d_no_bo[:-1, 0], inputs_2d_no_bo[:-1, 1], 
+                                        c=original_outputs, cmap='viridis', 
+                                        s=80, alpha=0.7, edgecolors='black', 
+                                        linewidth=1.5, vmin=vmin, vmax=vmax)
+        # Week 1 point (colored by output)
+        ax_right.scatter(inputs_2d_no_bo[-1, 0], inputs_2d_no_bo[-1, 1], s=150, 
+                       c=[new_output], cmap='viridis', alpha=0.9, 
+                       edgecolors='black', linewidth=2, marker='*', 
+                       zorder=5, vmin=vmin, vmax=vmax)
+        ax_right.set_xlabel('t-SNE 1', fontsize=9)
+        ax_right.set_ylabel('t-SNE 2', fontsize=9)
+        plt.colorbar(scatter_right, ax=ax_right, label='Output', shrink=0.8)
+    
+    ax_right.set_title(f'{function_name} ({n_dims}D) - without BO', fontsize=10)
     ax_right.grid(True, alpha=0.3)
 
