@@ -105,30 +105,11 @@ def load_week1_data(week1_dir=None):
     return week1_data
 
 
-def load_week2_data(week2_dir=None):
-    """
-    Load week 2 data for all functions.
-    
-    Parameters:
-    -----------
-    week2_dir : str or Path, optional
-        Week 2 data directory path. If None, uses default path.
-        Files may contain multiple lines; the last non-empty line is treated
-        as the latest week of inputs/outputs.
-    
-    Returns:
-    --------
-    week2_data : dict
-        Dictionary with keys 'function_1' through 'function_8',
-        each containing 'input' and 'output' arrays for week 2.
-    """
-    if week2_dir is None:
-        week2_dir = Path(__file__).parent / 'data' / 'week2'
-    else:
-        week2_dir = Path(week2_dir)
-    
-    inputs_path = week2_dir / 'inputs.txt'
-    outputs_path = week2_dir / 'outputs.txt'
+def _load_latest_week_data(week_dir, week_label):
+    """Load the latest week data block from the given directory."""
+    week_dir = Path(week_dir)
+    inputs_path = week_dir / 'inputs.txt'
+    outputs_path = week_dir / 'outputs.txt'
     
     def _split_blocks(lines):
         """Group lines into blocks that start with '[' to allow multi-line arrays."""
@@ -151,7 +132,7 @@ def load_week2_data(week2_dir=None):
         output_blocks = _split_blocks(f.readlines())
     
     if not input_blocks or not output_blocks:
-        raise ValueError("Week2 inputs/outputs files are empty or malformed.")
+        raise ValueError(f"{week_label} inputs/outputs files are empty or malformed.")
     
     # Use the last evaluable block to allow files that append previous weeks
     latest_inputs_list = None
@@ -169,17 +150,67 @@ def load_week2_data(week2_dir=None):
         break
     
     if latest_inputs_list is None or latest_outputs_list is None:
-        raise ValueError("Could not parse a valid block from week2 inputs/outputs.")
+        raise ValueError(f"Could not parse a valid block from {week_label} inputs/outputs.")
     
-    week2_data = {}
+    week_data = {}
     for function_num in range(1, 9):
         function_name = f'function_{function_num}'
-        week2_data[function_name] = {
+        week_data[function_name] = {
             'input': np.array(latest_inputs_list[function_num - 1]),
             'output': np.array(latest_outputs_list[function_num - 1])
         }
     
-    return week2_data
+    return week_data
+
+
+def load_week2_data(week2_dir=None):
+    """
+    Load week 2 data for all functions.
+    
+    Parameters:
+    -----------
+    week2_dir : str or Path, optional
+        Week 2 data directory path. If None, uses default path.
+        Files may contain multiple lines; the last non-empty line is treated
+        as the latest week of inputs/outputs.
+    
+    Returns:
+    --------
+    week2_data : dict
+        Dictionary with keys 'function_1' through 'function_8',
+        each containing 'input' and 'output' arrays for week 2.
+    """
+    if week2_dir is None:
+        week2_dir = Path(__file__).parent / 'data' / 'week2'
+    else:
+        week2_dir = Path(week2_dir)
+    
+    return _load_latest_week_data(week2_dir, "Week 2")
+
+
+def load_week3_data(week3_dir=None):
+    """
+    Load week 3 data for all functions.
+    
+    Parameters:
+    -----------
+    week3_dir : str or Path, optional
+        Week 3 data directory path. If None, uses default path.
+        Files may contain multiple lines; the last non-empty line is treated
+        as the latest week of inputs/outputs.
+    
+    Returns:
+    --------
+    week3_data : dict
+        Dictionary with keys 'function_1' through 'function_8',
+        each containing 'input' and 'output' arrays for week 3.
+    """
+    if week3_dir is None:
+        week3_dir = Path(__file__).parent / 'data' / 'week3'
+    else:
+        week3_dir = Path(week3_dir)
+    
+    return _load_latest_week_data(week3_dir, "Week 3")
 
 
 def combine_data(original_inputs, original_outputs, new_input, new_output):
@@ -660,7 +691,9 @@ def plot_bo_visualization_2d(bo, X_obs, y_obs, next_point, function_name,
 def plot_function_summary_subplot(ax_left, ax_right, original_inputs, original_outputs,
                                   week2_input, week2_output, bo_next_point,
                                   function_name, n_dims, random_state=42,
-                                  week1_input=None, week1_output=None):
+                                  week1_input=None, week1_output=None,
+                                  prior_point_label="Week 1 point",
+                                  new_point_label="Week 2 point"):
     """
     Plot function visualization in subplot axes (for summary grid).
     Shows input space visualization on left and output distribution on right.
@@ -692,6 +725,10 @@ def plot_function_summary_subplot(ax_left, ax_right, original_inputs, original_o
         Previous input point (e.g., Week 1)
     week1_output : float, optional
         Output value for the previous point
+    prior_point_label : str, optional
+        Label for the prior point in legends
+    new_point_label : str, optional
+        Label for the latest point in legends
     """
     original_inputs = np.array(original_inputs)
     original_outputs = np.array(original_outputs)
@@ -765,12 +802,12 @@ def plot_function_summary_subplot(ax_left, ax_right, original_inputs, original_o
                           c=[week1_output], cmap='viridis', alpha=0.9, 
                           edgecolors='black', linewidth=2, marker='*', 
                           zorder=5, vmin=vmin, vmax=vmax,
-                          label='Week 1 point')
+                          label=prior_point_label)
         ax_left.scatter(inputs_2d[week2_idx, 0], inputs_2d[week2_idx, 1], s=150, 
                       c=[week2_output], cmap='viridis', alpha=0.9, 
                       edgecolors='black', linewidth=2, marker='*', 
                       zorder=5, vmin=vmin, vmax=vmax,
-                      label='Week 2 point')
+                      label=new_point_label)
         if week1_idx is not None:
             ax_left.plot([inputs_2d[week1_idx, 0], inputs_2d[week2_idx, 0]],
                          [inputs_2d[week1_idx, 1], inputs_2d[week2_idx, 1]],
@@ -808,12 +845,12 @@ def plot_function_summary_subplot(ax_left, ax_right, original_inputs, original_o
                           c=[week1_output], cmap='viridis', alpha=0.9, 
                           edgecolors='black', linewidth=2, marker='*', 
                           zorder=5, vmin=vmin, vmax=vmax,
-                          label='Week 1 point')
+                          label=prior_point_label)
         ax_left.scatter(inputs_2d[week2_idx, 0], inputs_2d[week2_idx, 1], s=150, 
                       c=[week2_output], cmap='viridis', alpha=0.9, 
                       edgecolors='black', linewidth=2, marker='*', 
                       zorder=5, vmin=vmin, vmax=vmax,
-                      label='Week 2 point')
+                      label=new_point_label)
         if week1_idx is not None:
             ax_left.plot([inputs_2d[week1_idx, 0], inputs_2d[week2_idx, 0]],
                          [inputs_2d[week1_idx, 1], inputs_2d[week2_idx, 1]],
