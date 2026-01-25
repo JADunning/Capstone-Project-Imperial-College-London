@@ -1,0 +1,11 @@
+{
+  "function_name": "function_2",
+  "next_point": [
+    0.696760595458514,
+    0.9341067638557461
+  ],
+  "formatted": "0.696761-0.934107",
+  "method": "exploitative_bayesian_optimization",
+  "beta": 0.0,
+  "expected_value": 0.6149195678655854
+}

@@ -213,6 +213,31 @@ def load_week3_data(week3_dir=None):
     return _load_latest_week_data(week3_dir, "Week 3")
 
 
+def load_week4_data(week4_dir=None):
+    """
+    Load week 4 data for all functions.
+    
+    Parameters:
+    -----------
+    week4_dir : str or Path, optional
+        Week 4 data directory path. If None, uses default path.
+        Files may contain multiple lines; the last non-empty line is treated
+        as the latest week of inputs/outputs.
+    
+    Returns:
+    --------
+    week4_data : dict
+        Dictionary with keys 'function_1' through 'function_8',
+        each containing 'input' and 'output' arrays for week 4.
+    """
+    if week4_dir is None:
+        week4_dir = Path(__file__).parent / 'data' / 'week4'
+    else:
+        week4_dir = Path(week4_dir)
+    
+    return _load_latest_week_data(week4_dir, "Week 4")
+
+
 def combine_data(original_inputs, original_outputs, new_input, new_output):
     """
     Combine original data with new week data.
