@@ -148,9 +148,12 @@ pip install -r requirements.txt
 .
 ├── README.md                          # This file
 ├── requirements.txt                   # Python dependencies
-├── bayesian_optimization.py           # BO implementation (GP + UCB)
-├── data_utils.py                      # Data loading and visualization utilities
 ├── function_description_and_details.md # Function specifications
+├── scripts/                           # Python modules
+│   ├── bayesian_optimisation/         # BO (standard, exploitative, noise-aware)
+│   ├── logistic_regression/           # Linear and nonlinear logistic regression
+│   ├── neural_networks/               # PyTorch MLP next-point suggestion
+│   └── utils/                         # Data loading and visualization (data_utils)
 ├── data/                              # Query data by week
 │   ├── initial_data/
 │   ├── week1/

@@ -1,0 +1,10 @@
+{
+  "function_name": "function_3",
+  "next_point": [
+    0.0,
+    0.0,
+    0.853615555783607
+  ],
+  "formatted": "0.000000-0.000000-0.853616",
+  "method": "bayesian_optimization_for_noise"
+}

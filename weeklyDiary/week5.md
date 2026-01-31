@@ -52,7 +52,7 @@ My repository is organised into several key directories: data/ contains initial 
 
 weeklyWork/ contains analysis notebooks organized by week (e.g., week4/function1_logistic_regression.ipynb, week5/function1_nonlinear_logistic_regression.ipynb), while weeklyDiary/ stores weekly reflection documents. 
 
-Python modules (bayesian_optimization.py, nonlinear_logistic_regression.py, data_utils.py) are in the root directory for easy import.
+Python modules live under scripts/ (e.g. scripts/bayesian_optimisation/, scripts/logistic_regression/, scripts/utils/data_utils.py) for organised imports.
 
 #### What changes will you make to improve clarity, navigability and reproducibility?
 

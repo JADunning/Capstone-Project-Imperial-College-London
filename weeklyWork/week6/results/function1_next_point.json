@@ -1,0 +1,10 @@
+{
+  "function_name": "function_1",
+  "next_point": [
+    0.4166662496829559,
+    0.7095402846471306
+  ],
+  "formatted": "0.416666-0.709540",
+  "method": "nonlinear_logistic_regression",
+  "degree": 3
+}

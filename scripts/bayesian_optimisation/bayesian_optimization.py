@@ -232,4 +232,3 @@ class SimpleBayesianOptimization:
         best_y = y_all[best_idx]
         
         return X_all, y_all, best_x, best_y
-

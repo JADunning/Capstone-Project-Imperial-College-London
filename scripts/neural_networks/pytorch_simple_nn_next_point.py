@@ -106,43 +106,46 @@ def suggest_next_point_gradient(
     y_mean: torch.Tensor,
     y_std: torch.Tensor,
     n_restarts: int = 25,
-    max_iter: int = 100,
+    max_iter: int = 200,
     seed: int = 123,
+    lr: float = 0.05,
 ) -> tuple[np.ndarray, float]:
     """
-    Use gradient ascent to find the maximum.
-    Multiple random restarts to avoid local optima.
-    
-    This is more efficient than random sampling, especially in high dimensions.
+    Stable gradient ascent in [0,1]^d using sigmoid parameterization.
+    Optimizes the model's *normalized* output, then de-normalizes at the end.
+    Uses Adam instead of LBFGS (LBFGS is fragile with projection / scaling).
     """
     torch.manual_seed(seed)
     model.eval()
+
     best_x = None
-    best_pred = -np.inf
-    
+    best_pred = -float("inf")
+
     for _ in range(n_restarts):
-        # Random starting point
-        x = torch.rand(1, in_dim, requires_grad=True)
-        optimizer = torch.optim.LBFGS([x], max_iter=max_iter, line_search_fn='strong_wolfe')
-        
-        def closure():
-            optimizer.zero_grad()
-            pred = model(x) * y_std + y_mean
-            loss = -pred  # Negative because we want to maximize
+        # z is unconstrained; x = sigmoid(z) is always in (0,1)
+        z = torch.randn(1, in_dim, requires_grad=True)
+        opt = torch.optim.Adam([z], lr=lr)
+
+        for _ in range(max_iter):
+            opt.zero_grad()
+            x = torch.sigmoid(z)
+
+            # maximize normalized prediction (no y_std/y_mean scaling here)
+            pred_norm = model(x)          # shape: (1,)
+            loss = -pred_norm.mean()      # negative to maximize
             loss.backward()
-            # Project to stay in [0, 1] bounds
-            with torch.no_grad():
-                x.clamp_(0, 1)
-            return loss
-        
-        optimizer.step(closure)
-        
-        # Final evaluation
+
+            # optional: prevent any weird spikes
+            torch.nn.utils.clip_grad_norm_([z], max_norm=5.0)
+
+            opt.step()
+
         with torch.no_grad():
-            x.clamp_(0, 1)
-            pred = model(x) * y_std + y_mean
-            if pred.item() > best_pred:
-                best_pred = pred.item()
-                best_x = x.numpy()[0]
-    
-    return best_x, best_pred
+            x = torch.sigmoid(z)
+            pred = (model(x) * y_std + y_mean).item()   # de-normalize once
+            if pred > best_pred:
+                best_pred = pred
+                best_x = x.cpu().numpy()[0]
+
+    return best_x, float(best_pred)
+

@@ -14,6 +14,14 @@ from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
+# Project root (scripts/utils/data_utils.py -> parent.parent.parent)
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+
+
+def _project_root():
+    """Return project root directory (parent of scripts/)."""
+    return _PROJECT_ROOT
+
 
 def load_initial_data(base_dir=None):
     """
@@ -31,7 +39,7 @@ def load_initial_data(base_dir=None):
         each containing 'inputs' and 'outputs' arrays.
     """
     if base_dir is None:
-        base_dir = Path(__file__).parent / 'data' / 'initial_data'
+        base_dir = _project_root() / 'data' / 'initial_data'
     else:
         base_dir = Path(base_dir)
     
@@ -74,7 +82,7 @@ def load_week1_data(week1_dir=None):
         each containing 'input' and 'output' arrays.
     """
     if week1_dir is None:
-        week1_dir = Path(__file__).parent / 'data' / 'week1'
+        week1_dir = _project_root() / 'data' / 'week1'
     else:
         week1_dir = Path(week1_dir)
     
@@ -181,7 +189,7 @@ def load_week2_data(week2_dir=None):
         each containing 'input' and 'output' arrays for week 2.
     """
     if week2_dir is None:
-        week2_dir = Path(__file__).parent / 'data' / 'week2'
+        week2_dir = _project_root() / 'data' / 'week2'
     else:
         week2_dir = Path(week2_dir)
     
@@ -206,7 +214,7 @@ def load_week3_data(week3_dir=None):
         each containing 'input' and 'output' arrays for week 3.
     """
     if week3_dir is None:
-        week3_dir = Path(__file__).parent / 'data' / 'week3'
+        week3_dir = _project_root() / 'data' / 'week3'
     else:
         week3_dir = Path(week3_dir)
     
@@ -231,7 +239,7 @@ def load_week4_data(week4_dir=None):
         each containing 'input' and 'output' arrays for week 4.
     """
     if week4_dir is None:
-        week4_dir = Path(__file__).parent / 'data' / 'week4'
+        week4_dir = _project_root() / 'data' / 'week4'
     else:
         week4_dir = Path(week4_dir)
     
@@ -385,7 +393,8 @@ def plot_3d_scatter_with_distribution(original_inputs, original_outputs,
                                       prior_input=None, prior_output=None,
                                       prior_point_label="Prior point",
                                       connect_points=False,
-                                      connect_color="tab:gray"):
+                                      connect_color="tab:gray",
+                                      weekly_points=None):
     """
     Plot 3D scatter plot with output distribution for 3D functions.
     
@@ -415,6 +424,9 @@ def plot_3d_scatter_with_distribution(original_inputs, original_outputs,
         If True, draw a line between prior and new points
     connect_color : str, default="tab:gray"
         Color for the connecting line
+    weekly_points : list of (input, output, label), optional
+        When provided, plot all weekly points (e.g. Week 1-5) with labels
+        and connect them in sequence. Overrides prior_* params.
     """
     original_inputs = np.array(original_inputs)
     original_outputs = np.array(original_outputs)
@@ -428,9 +440,14 @@ def plot_3d_scatter_with_distribution(original_inputs, original_outputs,
     all_outputs = [original_outputs, np.array([new_output])]
     if prior_output is not None:
         all_outputs.append(np.array([prior_output]))
+    if weekly_points:
+        for _, out, _ in weekly_points:
+            all_outputs.append(np.array([float(out)]))
     all_outputs = np.concatenate(all_outputs)
     vmin = all_outputs.min()
     vmax = all_outputs.max()
+    
+    weekly_colors = ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00']
     
     fig = plt.figure(figsize=figsize)
     
@@ -446,25 +463,37 @@ def plot_3d_scatter_with_distribution(original_inputs, original_outputs,
                           alpha=0.8, edgecolors='black', linewidth=1,
                           vmin=vmin, vmax=vmax)
     
-    x1_new = new_input[0]
-    x2_new = new_input[1]
-    x3_new = new_input[2]
-    scatter2 = ax1.scatter(x1_new, x2_new, x3_new, s=300, c=[new_output], 
-                          cmap='viridis', alpha=0.9, edgecolors='black', 
-                          linewidth=2, marker='*', vmin=vmin, vmax=vmax,
-                          label=new_point_label)
-    
-    if prior_input is not None and prior_output is not None:
-        ax1.scatter(prior_input[0], prior_input[1], prior_input[2], s=260,
-                   c=[prior_output], cmap='viridis', alpha=0.9, edgecolors='black',
-                   linewidth=2, marker='*', vmin=vmin, vmax=vmax,
-                   label=prior_point_label)
-        if connect_points:
-            ax1.plot([prior_input[0], new_input[0]],
-                     [prior_input[1], new_input[1]],
-                     [prior_input[2], new_input[2]],
-                     linestyle='--', color=connect_color, linewidth=2,
-                     alpha=0.8)
+    if weekly_points:
+        for i, (inp, out, lbl) in enumerate(weekly_points):
+            inp = np.array(inp)
+            color = weekly_colors[i % len(weekly_colors)]
+            ax1.scatter(inp[0], inp[1], inp[2], s=260,
+                       c=[out], cmap='viridis', alpha=0.9, edgecolors=color,
+                       linewidth=2, marker='*', vmin=vmin, vmax=vmax,
+                       label=lbl)
+        if connect_points and len(weekly_points) >= 2:
+            for i in range(len(weekly_points) - 1):
+                inp1 = np.array(weekly_points[i][0])
+                inp2 = np.array(weekly_points[i + 1][0])
+                ax1.plot([inp1[0], inp2[0]], [inp1[1], inp2[1]], [inp1[2], inp2[2]],
+                         linestyle='--', color=connect_color, linewidth=2, alpha=0.8)
+    else:
+        x1_new, x2_new, x3_new = new_input[0], new_input[1], new_input[2]
+        ax1.scatter(x1_new, x2_new, x3_new, s=300, c=[new_output], 
+                    cmap='viridis', alpha=0.9, edgecolors='black', 
+                    linewidth=2, marker='*', vmin=vmin, vmax=vmax,
+                    label=new_point_label)
+        if prior_input is not None and prior_output is not None:
+            ax1.scatter(prior_input[0], prior_input[1], prior_input[2], s=260,
+                       c=[prior_output], cmap='viridis', alpha=0.9, edgecolors='black',
+                       linewidth=2, marker='*', vmin=vmin, vmax=vmax,
+                       label=prior_point_label)
+            if connect_points:
+                ax1.plot([prior_input[0], new_input[0]],
+                         [prior_input[1], new_input[1]],
+                         [prior_input[2], new_input[2]],
+                         linestyle='--', color=connect_color, linewidth=2,
+                         alpha=0.8)
     
     ax1.set_xlabel('x1', fontsize=12)
     ax1.set_ylabel('x2', fontsize=12)
@@ -477,12 +506,18 @@ def plot_3d_scatter_with_distribution(original_inputs, original_outputs,
     # Right plot: Output distribution
     ax2 = fig.add_subplot(122)
     ax2.hist(original_outputs, bins=min(15, len(original_outputs)), 
-            edgecolor='black', alpha=0.7, label='Original outputs')
-    ax2.axvline(new_output, color='red', linestyle='--', linewidth=2, 
-               label=f'{new_point_label}: {new_output:.4f}')
-    if prior_output is not None:
-        ax2.axvline(prior_output, color='orange', linestyle='-.', linewidth=2,
-                   label=f'{prior_point_label}: {prior_output:.4f}')
+            edgecolor='black', alpha=0.7, label='All outputs')
+    if weekly_points:
+        for i, (_, out, lbl) in enumerate(weekly_points):
+            color = weekly_colors[i % len(weekly_colors)]
+            ax2.axvline(out, color=color, linestyle='--', linewidth=1.5,
+                       label=f'{lbl}: {out:.4f}')
+    else:
+        ax2.axvline(new_output, color='red', linestyle='--', linewidth=2, 
+                   label=f'{new_point_label}: {new_output:.4f}')
+        if prior_output is not None:
+            ax2.axvline(prior_output, color='orange', linestyle='-.', linewidth=2,
+                       label=f'{prior_point_label}: {prior_output:.4f}')
     ax2.set_xlabel('Output Value', fontsize=12)
     ax2.set_ylabel('Frequency', fontsize=12)
     ax2.set_title(f'{function_name} - Output Distribution', fontsize=14)
