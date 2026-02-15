@@ -1,0 +1,17 @@
+{
+  "function_name": "function_6",
+  "next_point": [
+    0.42409684999514596,
+    0.23671491144083454,
+    0.5889725428121879,
+    0.9507216136787624,
+    0.36253094768179756
+  ],
+  "formatted": "0.424097-0.236715-0.588973-0.950722-0.362531",
+  "method": "exploitative_bayesian_optimization",
+  "beta": 0.0,
+  "expected_value": -0.2430795088389459,
+  "validation_status": "plateau",
+  "validation_message": "Near best but improvements are small. Best=-0.322186, last=-0.340421",
+  "validation_flag": true
+}

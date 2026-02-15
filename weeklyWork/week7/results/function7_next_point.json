@@ -1,0 +1,19 @@
+{
+  "function_name": "function_7",
+  "next_point": [
+    0.05593157559633255,
+    0.3055603802204132,
+    0.43312737345695496,
+    0.18810512125492096,
+    0.30574312806129456,
+    0.6353666186332703
+  ],
+  "formatted": "0.055932-0.305560-0.433127-0.188105-0.305743-0.635367",
+  "method": "pytorch_neural_network_gradient_optimization",
+  "predicted_score": 2.7762768268585205,
+  "epochs": 1200,
+  "hidden": 64,
+  "lr": 0.001,
+  "n_restarts": 25,
+  "max_iter": 100
+}

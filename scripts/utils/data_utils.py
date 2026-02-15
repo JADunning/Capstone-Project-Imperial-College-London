@@ -285,7 +285,8 @@ def plot_2d_scatter_with_distribution(original_inputs, original_outputs,
                                        prior_input=None, prior_output=None,
                                        prior_point_label="Prior point",
                                        connect_points=False,
-                                       connect_color="tab:gray"):
+                                       connect_color="tab:gray",
+                                       weekly_points=None):
     """
     Plot 2D scatter plot with output distribution for 2D functions.
     
@@ -315,6 +316,9 @@ def plot_2d_scatter_with_distribution(original_inputs, original_outputs,
         If True, draw a line between prior and new points
     connect_color : str, default="tab:gray"
         Color for the connecting line
+    weekly_points : list of (input, output, label), optional
+        When provided, plot all weekly points (e.g. Week 1-6) with labels
+        and connect them in sequence. Overrides prior_* params.
     """
     original_inputs = np.array(original_inputs)
     original_outputs = np.array(original_outputs)
@@ -328,9 +332,14 @@ def plot_2d_scatter_with_distribution(original_inputs, original_outputs,
     all_outputs = [original_outputs, np.array([new_output])]
     if prior_output is not None:
         all_outputs.append(np.array([prior_output]))
+    if weekly_points:
+        for _, out, _ in weekly_points:
+            all_outputs.append(np.array([float(out)]))
     all_outputs = np.concatenate(all_outputs)
     vmin = all_outputs.min()
     vmax = all_outputs.max()
+    
+    weekly_colors = ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#a65628']
     
     fig, axes = plt.subplots(1, 2, figsize=figsize)
     
@@ -343,23 +352,37 @@ def plot_2d_scatter_with_distribution(original_inputs, original_outputs,
                                linewidth=1.5, label='Original points',
                                vmin=vmin, vmax=vmax)
     
-    x1_new = new_input[0]
-    x2_new = new_input[1]
-    scatter2 = axes[0].scatter(x1_new, x2_new, c=[new_output], 
-                              cmap='viridis', s=200, alpha=0.9, 
-                              edgecolors='black', linewidth=2, marker='*',
-                              label=new_point_label, vmin=vmin, vmax=vmax)
-    
-    if prior_input is not None and prior_output is not None:
-        axes[0].scatter(prior_input[0], prior_input[1], c=[prior_output],
-                        cmap='viridis', s=180, alpha=0.9,
+    if weekly_points:
+        for i, (inp, out, lbl) in enumerate(weekly_points):
+            inp = np.array(inp)
+            color = weekly_colors[i % len(weekly_colors)]
+            axes[0].scatter(inp[0], inp[1], c=[out], cmap='viridis',
+                            s=260, alpha=0.9, edgecolors=color,
+                            linewidth=2, marker='*', vmin=vmin, vmax=vmax,
+                            label=lbl)
+        if connect_points and len(weekly_points) >= 2:
+            for i in range(len(weekly_points) - 1):
+                inp1 = np.array(weekly_points[i][0])
+                inp2 = np.array(weekly_points[i + 1][0])
+                axes[0].plot([inp1[0], inp2[0]], [inp1[1], inp2[1]],
+                             linestyle='--', color=connect_color, linewidth=2, alpha=0.8)
+    else:
+        x1_new = new_input[0]
+        x2_new = new_input[1]
+        axes[0].scatter(x1_new, x2_new, c=[new_output], 
+                        cmap='viridis', s=200, alpha=0.9, 
                         edgecolors='black', linewidth=2, marker='*',
-                        label=prior_point_label, vmin=vmin, vmax=vmax)
-        if connect_points:
-            axes[0].plot([prior_input[0], new_input[0]],
-                         [prior_input[1], new_input[1]],
-                         linestyle='--', color=connect_color, linewidth=2,
-                         alpha=0.8)
+                        label=new_point_label, vmin=vmin, vmax=vmax)
+        if prior_input is not None and prior_output is not None:
+            axes[0].scatter(prior_input[0], prior_input[1], c=[prior_output],
+                            cmap='viridis', s=180, alpha=0.9,
+                            edgecolors='black', linewidth=2, marker='*',
+                            label=prior_point_label, vmin=vmin, vmax=vmax)
+            if connect_points:
+                axes[0].plot([prior_input[0], new_input[0]],
+                             [prior_input[1], new_input[1]],
+                             linestyle='--', color=connect_color, linewidth=2,
+                             alpha=0.8)
     
     plt.colorbar(scatter1, ax=axes[0], label='Output value')
     axes[0].set_xlabel('x1 (Input 1)', fontsize=12)
@@ -371,11 +394,17 @@ def plot_2d_scatter_with_distribution(original_inputs, original_outputs,
     # Right plot: Output distribution
     axes[1].hist(original_outputs, bins=min(10, len(original_outputs)), 
                 edgecolor='black', alpha=0.7, label='Original outputs')
-    axes[1].axvline(new_output, color='red', linestyle='--', linewidth=2, 
-                   label=f'{new_point_label}: {new_output:.2e}')
-    if prior_output is not None:
-        axes[1].axvline(prior_output, color='orange', linestyle='-.', linewidth=2,
-                       label=f'{prior_point_label}: {prior_output:.2e}')
+    if weekly_points:
+        for i, (_, out, lbl) in enumerate(weekly_points):
+            color = weekly_colors[i % len(weekly_colors)]
+            axes[1].axvline(out, color=color, linestyle='--', linewidth=1.5,
+                           label=f'{lbl}: {out:.4f}')
+    else:
+        axes[1].axvline(new_output, color='red', linestyle='--', linewidth=2, 
+                       label=f'{new_point_label}: {new_output:.2e}')
+        if prior_output is not None:
+            axes[1].axvline(prior_output, color='orange', linestyle='-.', linewidth=2,
+                           label=f'{prior_point_label}: {prior_output:.2e}')
     axes[1].set_xlabel('Output Value', fontsize=12)
     axes[1].set_ylabel('Frequency', fontsize=12)
     axes[1].set_title(f'{function_name} - Output Distribution', fontsize=14)
@@ -535,7 +564,8 @@ def plot_tsne_with_distribution(original_inputs, original_outputs,
                                 prior_input=None, prior_output=None,
                                 prior_point_label="Prior point",
                                 connect_points=False,
-                                connect_color="tab:gray"):
+                                connect_color="tab:gray",
+                                weekly_points=None):
     """
     Plot t-SNE visualization with output distribution for high-dimensional functions.
     
@@ -567,6 +597,9 @@ def plot_tsne_with_distribution(original_inputs, original_outputs,
         If True, draw a line between prior and new points (in t-SNE space)
     connect_color : str, default="tab:gray"
         Color for the connecting line
+    weekly_points : list of (input, output, label), optional
+        When provided, plot all weekly points (e.g. Week 1-6) with labels
+        and connect them in sequence. Overrides prior_* params.
     """
     original_inputs = np.array(original_inputs)
     original_outputs = np.array(original_outputs)
@@ -578,15 +611,22 @@ def plot_tsne_with_distribution(original_inputs, original_outputs,
     
     # Combine inputs for t-SNE
     combined_list = [original_inputs]
-    if prior_input is not None:
-        combined_list.append(prior_input.reshape(1, -1))
-    combined_list.append(new_input.reshape(1, -1))
+    if weekly_points:
+        for inp, _, _ in weekly_points:
+            combined_list.append(np.array(inp).reshape(1, -1))
+    else:
+        if prior_input is not None:
+            combined_list.append(prior_input.reshape(1, -1))
+        combined_list.append(new_input.reshape(1, -1))
     combined_inputs = np.vstack(combined_list)
     
     # Combine for color scale
     all_outputs = [original_outputs, np.array([new_output])]
-    if prior_output is not None:
+    if prior_output is not None and not weekly_points:
         all_outputs.append(np.array([prior_output]))
+    if weekly_points:
+        for _, out, _ in weekly_points:
+            all_outputs.append(np.array([float(out)]))
     all_outputs = np.concatenate(all_outputs)
     vmin = all_outputs.min()
     vmax = all_outputs.max()
@@ -595,6 +635,8 @@ def plot_tsne_with_distribution(original_inputs, original_outputs,
     tsne = TSNE(n_components=2, random_state=random_state, 
                perplexity=min(30, len(combined_inputs)-1))
     inputs_2d = tsne.fit_transform(combined_inputs)
+    
+    weekly_colors = ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#a65628']
     
     fig, axes = plt.subplots(1, 2, figsize=figsize)
     
@@ -607,29 +649,46 @@ def plot_tsne_with_distribution(original_inputs, original_outputs,
                               linewidth=1.5, label='Original points',
                               vmin=vmin, vmax=vmax)
     
-    prior_index = None
-    if prior_input is not None:
-        prior_index = len(original_inputs)
-        axes[0].scatter(inputs_2d[prior_index, 0],
-                        inputs_2d[prior_index, 1],
-                        c=[prior_output], cmap='viridis',
-                        s=180, alpha=0.9, edgecolors='black',
+    if weekly_points:
+        offset = len(original_inputs)
+        for i, (_, out, lbl) in enumerate(weekly_points):
+            idx = offset + i
+            color = weekly_colors[i % len(weekly_colors)]
+            axes[0].scatter(inputs_2d[idx, 0], inputs_2d[idx, 1],
+                            c=[out], cmap='viridis',
+                            s=260, alpha=0.9, edgecolors=color,
+                            linewidth=2, marker='*', vmin=vmin, vmax=vmax,
+                            label=lbl)
+        if connect_points and len(weekly_points) >= 2:
+            for i in range(len(weekly_points) - 1):
+                idx1 = offset + i
+                idx2 = offset + i + 1
+                axes[0].plot([inputs_2d[idx1, 0], inputs_2d[idx2, 0]],
+                             [inputs_2d[idx1, 1], inputs_2d[idx2, 1]],
+                             linestyle='--', color=connect_color, linewidth=2, alpha=0.8)
+    else:
+        prior_index = None
+        if prior_input is not None:
+            prior_index = len(original_inputs)
+            axes[0].scatter(inputs_2d[prior_index, 0],
+                            inputs_2d[prior_index, 1],
+                            c=[prior_output], cmap='viridis',
+                            s=180, alpha=0.9, edgecolors='black',
+                            linewidth=2, marker='*',
+                            label=prior_point_label, vmin=vmin, vmax=vmax)
+        
+        new_index = len(combined_inputs) - 1
+        axes[0].scatter(inputs_2d[new_index, 0], inputs_2d[new_index, 1], 
+                        c=[new_output], cmap='viridis', 
+                        s=200, alpha=0.9, edgecolors='black', 
                         linewidth=2, marker='*',
-                        label=prior_point_label, vmin=vmin, vmax=vmax)
-    
-    new_index = len(combined_inputs) - 1
-    scatter2 = axes[0].scatter(inputs_2d[new_index, 0], 
-                              inputs_2d[new_index, 1], 
-                              c=[new_output], cmap='viridis', 
-                              s=200, alpha=0.9, edgecolors='black', 
-                              linewidth=2, marker='*',
-                              label=new_point_label, vmin=vmin, vmax=vmax)
-    
-    if connect_points and prior_index is not None:
-        axes[0].plot([inputs_2d[prior_index, 0], inputs_2d[new_index, 0]],
-                     [inputs_2d[prior_index, 1], inputs_2d[new_index, 1]],
-                     linestyle='--', color=connect_color, linewidth=2,
-                     alpha=0.8)
+                        label=new_point_label, vmin=vmin, vmax=vmax)
+        
+        if connect_points and prior_index is not None:
+            axes[0].plot([inputs_2d[prior_index, 0], inputs_2d[new_index, 0]],
+                         [inputs_2d[prior_index, 1], inputs_2d[new_index, 1]],
+                         linestyle='--', color=connect_color, linewidth=2,
+                         alpha=0.8)
     
     plt.colorbar(scatter1, ax=axes[0], label='Output value')
     axes[0].set_xlabel('t-SNE Dimension 1', fontsize=12)
@@ -641,11 +700,17 @@ def plot_tsne_with_distribution(original_inputs, original_outputs,
     # Right plot: Output distribution
     axes[1].hist(original_outputs, bins=min(15, len(original_outputs)), 
                 edgecolor='black', alpha=0.7, label='Original outputs')
-    axes[1].axvline(new_output, color='red', linestyle='--', linewidth=2, 
-                   label=f'{new_point_label}: {new_output:.4f}')
-    if prior_output is not None:
-        axes[1].axvline(prior_output, color='orange', linestyle='-.', linewidth=2,
-                       label=f'{prior_point_label}: {prior_output:.4f}')
+    if weekly_points:
+        for i, (_, out, lbl) in enumerate(weekly_points):
+            color = weekly_colors[i % len(weekly_colors)]
+            axes[1].axvline(out, color=color, linestyle='--', linewidth=1.5,
+                           label=f'{lbl}: {out:.4f}')
+    else:
+        axes[1].axvline(new_output, color='red', linestyle='--', linewidth=2, 
+                       label=f'{new_point_label}: {new_output:.4f}')
+        if prior_output is not None:
+            axes[1].axvline(prior_output, color='orange', linestyle='-.', linewidth=2,
+                           label=f'{prior_point_label}: {prior_output:.4f}')
     axes[1].set_xlabel('Output Value', fontsize=12)
     axes[1].set_ylabel('Frequency', fontsize=12)
     axes[1].set_title(f'{function_name} - Output Distribution', fontsize=14)

@@ -1,0 +1,10 @@
+{
+  "function_name": "function_3",
+  "next_point": [
+    0.49258141463713434,
+    0.6115931882759961,
+    0.3401763860035727
+  ],
+  "formatted": "0.492581-0.611593-0.340176",
+  "method": "re_evaluate_incumbent"
+}
