@@ -5,10 +5,11 @@
 
 ## Table of Contents
 1. [Project Overview](#project-overview)
-2. [Inputs and Outputs](#inputs-and-outputs)
-3. [Challenge Objectives](#challenge-objectives)
-4. [Technical Approach](#technical-approach)
-5. [Setup Instructions](#setup-instructions)
+2. [Datasheet and Model Card](#datasheet-and-model-card)
+3. [Inputs and Outputs](#inputs-and-outputs)
+4. [Challenge Objectives](#challenge-objectives)
+5. [Technical Approach](#technical-approach)
+6. [Setup Instructions](#setup-instructions)
 
 ---
 
@@ -33,7 +34,15 @@ This project directly applies to my career goals in data science and machine lea
 - Documentation and communication
 
 
-## 2. Inputs and Outputs
+## 2. Datasheet and Model Card
+
+Documentation for reproducibility and transparency (Mini-lessons 21.1 and 21.2):
+
+- **[Datasheet](DATASHEET.md)** — Documents the BBO capstone dataset: motivation, composition, collection process, preprocessing, intended/inappropriate uses, and distribution/maintenance.
+- **[Model Card](MODEL_CARD.md)** — Describes the optimisation approach: overview, intended use, strategy across the ten rounds, performance summary, assumptions and limitations, and ethical considerations.
+
+
+## 3. Inputs and Outputs
 
 ### Input Format
 
@@ -73,7 +82,7 @@ output = 0.427  # Higher is better (maximization)
 - **Sparsity**: Some functions (e.g., Function 1) return 0 for most of the input space
 
 
-## 3. Challenge Objectives
+## 4. Challenge Objectives
 
 ### Primary Goal
 
@@ -89,7 +98,7 @@ output = 0.427  # Higher is better (maximization)
 3. **Evaluation Delay**: Weekly submission cadence requires planning ahead
 
 
-## 4. Technical Approach
+## 5. Technical Approach
 
 This section documents my evolving optimization strategy across the first three weeks of submissions. The approach emphasizes **early exploration** before transitioning to **exploitation** in later weeks.
 
@@ -113,7 +122,7 @@ This section documents my evolving optimization strategy across the first three 
 
 ---
 
-## 5. Setup Instructions
+## 6. Setup Instructions
 
 ### Activate Virtual Environment
 
