@@ -1,0 +1,15 @@
+{
+  "function_name": "function_5",
+  "next_point": [
+    0.26385799653389164,
+    0.8403737973418167,
+    0.9694962850659917,
+    0.8895068347488241
+  ],
+  "formatted": "0.263858-0.840374-0.969496-0.889507",
+  "method": "bayesian_optimization_exploitative",
+  "expected_value": 1575.327866153828,
+  "validation_status": "improving",
+  "validation_message": "Recent trend is positive, moving toward best=4219.157963",
+  "validation_flag": false
+}

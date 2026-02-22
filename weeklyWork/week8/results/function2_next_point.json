@@ -1,0 +1,15 @@
+{
+  "function_name": "function_2",
+  "next_point": [
+    1.0,
+    1.0
+  ],
+  "formatted": "1.000000-1.000000",
+  "method": "bayesian_optimization_exploitative_mean",
+  "acquisition": "mean",
+  "expected_value": 1.2184702179045708,
+  "expected_std": 0.3561519144556337,
+  "validation_status": "plateau",
+  "validation_message": "Near best but improvements are small. Best=0.718470, last=0.504419",
+  "validation_flag": true
+}

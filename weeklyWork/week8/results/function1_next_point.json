@@ -1,0 +1,20 @@
+{
+  "function_name": "function_1",
+  "next_point": [
+    0.5759633575831518,
+    0.6664739951614772
+  ],
+  "formatted": "0.575963-0.666474",
+  "method": "nonlinear_logistic_regression",
+  "degree": 3,
+  "data_weeks": [
+    "initial",
+    "week1",
+    "week2",
+    "week3",
+    "week4",
+    "week5",
+    "week6",
+    "week7"
+  ]
+}
