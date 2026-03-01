@@ -104,7 +104,7 @@ def make_inputs_outputs_table(X, y, n_initial, x_proposed=None, y_proposed=None)
     one row per week (week 1, week 2, ...). Progress is "Improving" when the
     output is higher than the previous week (we assume we want to maximise).
 
-    Optionally append a row for "proposed week 8" (or next week) with an
+    Optionally append a row for "proposed this week" with an
     estimated output and computed distance/progress.
 
     Parameters
@@ -117,8 +117,8 @@ def make_inputs_outputs_table(X, y, n_initial, x_proposed=None, y_proposed=None)
         Number of initial points (rows 0 .. n_initial-1). Remaining rows are
         treated as week 1, week 2, etc.
     x_proposed : array-like, shape (n_features,), optional
-        Proposed next input (e.g. for week 8). If provided, a row with
-        Source "proposed week 8" is appended.
+        Proposed next input. If provided, a row with
+        Source "proposed this week" is appended.
     y_proposed : float, optional
         Estimated output at x_proposed. If x_proposed is given and y_proposed
         is None, the output value for the proposed row is NaN.
@@ -128,7 +128,7 @@ def make_inputs_outputs_table(X, y, n_initial, x_proposed=None, y_proposed=None)
     pd.DataFrame
         Columns: Source, Input number, Output value, Distance to maximum input,
         Summary of progress. Source is the data folder (e.g. "initial", "week1",
-        "week7") plus optionally "proposed week 8".
+        "week7") plus optionally "proposed this week".
     """
     X = np.asarray(X)
     y = np.asarray(y).ravel()
@@ -151,11 +151,11 @@ def make_inputs_outputs_table(X, y, n_initial, x_proposed=None, y_proposed=None)
             # Later weeks: compare to previous week
             progress.append("Improving" if y[i] > y[i - 1] else "Not improving")
 
-    # Optional proposed week 8 row
+    # Optional proposed this week row
     if x_proposed is not None:
         x_proposed = np.asarray(x_proposed).ravel()
         dist_proposed = float(np.linalg.norm(x_proposed - x_best))
-        source.append("proposed week 8")
+        source.append("proposed this week")
         n += 1
         distances = np.append(distances, dist_proposed)
         if y_proposed is not None:
