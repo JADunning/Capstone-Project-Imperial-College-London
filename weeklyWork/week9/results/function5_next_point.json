@@ -1,0 +1,22 @@
+{
+  "function_name": "function_5",
+  "next_point": [
+    1.0,
+    1.0,
+    1.0,
+    0.893494
+  ],
+  "formatted": "1.000000-1.000000-1.000000-0.893494",
+  "method": "bayesian_optimization_exploitative_local_noise_aware",
+  "acquisition": "mean_local_trust_region",
+  "expected_value": 4787.681698642917,
+  "expected_std": 156.72988827380675,
+  "distance_to_incumbent": 0.11251509898675821,
+  "raw_points": 28,
+  "model_points": 26,
+  "merged_clusters": 2,
+  "kernel": "1.45**2 * RBF(length_scale=0.71) + WhiteKernel(noise_level=0.00163)",
+  "validation_status": "improving",
+  "validation_message": "Recent trend is positive, moving toward best=4219.157963",
+  "validation_flag": false
+}
