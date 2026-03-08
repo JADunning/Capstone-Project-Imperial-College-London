@@ -1,6 +1,3 @@
-# Exclude examples folder
-examples/
-
 # Python virtual environment
 .venv/
 venv/
