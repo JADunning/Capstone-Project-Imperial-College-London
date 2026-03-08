@@ -5,11 +5,12 @@
 
 ## Table of Contents
 1. [Project Overview](#project-overview)
-2. [Datasheet and Model Card](#datasheet-and-model-card)
-3. [Inputs and Outputs](#inputs-and-outputs)
-4. [Challenge Objectives](#challenge-objectives)
-5. [Technical Approach](#technical-approach)
-6. [Setup Instructions](#setup-instructions)
+2. [Project Presentation](#project-presentation)
+3. [Datasheet and Model Card](#datasheet-and-model-card)
+4. [Inputs and Outputs](#inputs-and-outputs)
+5. [Challenge Objectives](#challenge-objectives)
+6. [Technical Approach](#technical-approach)
+7. [Setup Instructions](#setup-instructions)
 
 ---
 
@@ -25,6 +26,12 @@ BBO is fundamental to many real-world machine learning and engineering applicati
 
 The key challenge is that **function evaluations are expensive** (limited to ~10 queries per week), and we must be strategic about where to sample to find optimal solutions efficiently.
 
+### Project Presentation
+
+A structured **project presentation** covering the BBO approach, strategy evolution, patterns and insights, decision-making, and next steps is available here:
+
+- **[PROJECT_PRESENTATION.md](PROJECT_PRESENTATION.md)** — Overview of the optimisation approach, how the strategy evolved, key data patterns, exploration vs exploitation, and reflection for stakeholders.
+
 ### Career Relevance
 
 This project directly applies to my career goals in data science and machine learning engineering because it demonstrates:
@@ -34,7 +41,7 @@ This project directly applies to my career goals in data science and machine lea
 - Documentation and communication
 
 
-## 2. Datasheet and Model Card
+## 3. Datasheet and Model Card
 
 Documentation for reproducibility and transparency (Mini-lessons 21.1 and 21.2):
 
@@ -42,7 +49,7 @@ Documentation for reproducibility and transparency (Mini-lessons 21.1 and 21.2):
 - **[Model Card](MODEL_CARD.md)** — Describes the optimisation approach: overview, intended use, strategy across the ten rounds, performance summary, assumptions and limitations, and ethical considerations.
 
 
-## 3. Inputs and Outputs
+## 4. Inputs and Outputs
 
 ### Input Format
 
@@ -82,7 +89,7 @@ output = 0.427  # Higher is better (maximization)
 - **Sparsity**: Some functions (e.g., Function 1) return 0 for most of the input space
 
 
-## 4. Challenge Objectives
+## 5. Challenge Objectives
 
 ### Primary Goal
 
@@ -98,7 +105,7 @@ output = 0.427  # Higher is better (maximization)
 3. **Evaluation Delay**: Weekly submission cadence requires planning ahead
 
 
-## 5. Technical Approach
+## 6. Technical Approach
 
 This section documents my evolving optimization strategy across the first three weeks of submissions. The approach emphasizes **early exploration** before transitioning to **exploitation** in later weeks.
 
@@ -122,7 +129,7 @@ This section documents my evolving optimization strategy across the first three 
 
 ---
 
-## 6. Setup Instructions
+## 7. Setup Instructions
 
 ### Activate Virtual Environment
 

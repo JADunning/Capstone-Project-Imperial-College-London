@@ -1,0 +1,18 @@
+{
+  "function_name": "function_3",
+  "next_point": [
+    0.608214458354956,
+    0.42653059747404265,
+    0.5132704099226103
+  ],
+  "formatted": "0.608214-0.426531-0.513270",
+  "method": "noise_aware_exploitative_bayesian_optimization",
+  "beta": 0.0,
+  "expected_value": -0.013901887595100249,
+  "predicted_std": 0.014648855247554618,
+  "distance_to_incumbent": 0.14879094412331345,
+  "validation_status": "plateau",
+  "validation_message": "Near best but improvements are small. Best=-0.005533, last=-0.029798",
+  "validation_flag": true,
+  "week11_strategy_note": "Week 11 switches Function 3 to an optimisation-only notebook that mirrors Functions 4 and 6, while keeping a noise-aware GP and using beta=0.0 for local refinement around the best region."
+}

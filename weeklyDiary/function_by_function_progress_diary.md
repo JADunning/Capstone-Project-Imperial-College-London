@@ -16,6 +16,13 @@ This document tracks the optimization strategy and progress for each function ac
 
 
 
+
+Week 11
+- For this week, we target `TARGET_PROB = 0.9` (instead of only the 0.5 boundary) and optimize from the incumbent so the suggestion stays near the best-known region.
+- Class-assignments table: added **Rank** (1 = best) and **Size** bar for quick eyeballing of relative output size; dropped the confusing log10 column and clarified that the threshold is the chosen percentile (Class 1 = top %).
+
+
+
 ---
 
 ## Function 2 (2D - Maximize)

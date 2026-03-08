@@ -12,6 +12,7 @@ from sklearn.preprocessing import StandardScaler, PolynomialFeatures
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix, accuracy_score
 from scipy.optimize import minimize, differential_evolution
+from scipy.special import expit
 
 
 def make_binary_labels(y, threshold=None, threshold_percentile=75):
@@ -104,6 +105,8 @@ class NonLinearLogisticRegression:
             max_iter=max_iter,
             solver=solver,
         )
+        # Optional: shift the 50% band so it passes through a chosen point (e.g. incumbent)
+        self._boundary_shift = None
     
     def fit_scaler(self, X):
         """
@@ -179,6 +182,9 @@ class NonLinearLogisticRegression:
         """
         Predict class probabilities.
         
+        If set_boundary_through() was called, the 50% band is shifted so it
+        passes through that point; probabilities use this shifted boundary.
+        
         Parameters:
         -----------
         X : array-like, shape (n_samples, n_features)
@@ -190,7 +196,36 @@ class NonLinearLogisticRegression:
             Probabilities for each class [P(Class 0), P(Class 1)]
         """
         X_transformed = self.transform(X)
+        if self._boundary_shift is not None:
+            decision = self.model.decision_function(X_transformed)
+            if decision.ndim == 0:
+                decision = np.atleast_1d(decision)
+            prob1 = expit(decision + self._boundary_shift)
+            return np.column_stack([1 - prob1, prob1])
         return self.model.predict_proba(X_transformed)
+
+    def set_boundary_through(self, x0):
+        """
+        Shift the 50% probability band so it passes through the point x0.
+        
+        After this call, predict_proba(x0) will return 0.5 for class 1.
+        Useful to make "point near the boundary" land near the incumbent:
+        call set_boundary_through(incumbent_input), then find_next_point_near_boundary
+        with x0_start=incumbent_input to get a point on the boundary near the incumbent.
+        
+        Parameters:
+        -----------
+        x0 : array-like, shape (n_features,)
+            Point that should lie on the decision boundary (prob = 0.5).
+        """
+        x0 = np.asarray(x0, dtype=float).reshape(1, -1)
+        X_transformed = self.transform(x0)
+        decision_at_x0 = self.model.decision_function(X_transformed)
+        if np.isscalar(decision_at_x0):
+            decision_at_x0 = float(decision_at_x0)
+        else:
+            decision_at_x0 = float(decision_at_x0.flat[0])
+        self._boundary_shift = -decision_at_x0
     
     def confusion_matrix(self, y_true, y_pred):
         """Compute the confusion matrix."""
@@ -206,12 +241,18 @@ class NonLinearLogisticRegression:
         n_candidates=1000,
         method="grid_search",
         random_state=None,
+        x0_start=None,
+        target_probability=0.5,
     ):
         """
-        Find the next point closest to the decision boundary (probability ≈ 0.5).
+        Find the next point closest to a target probability contour.
         
         This is useful for active learning - points near the boundary are most
         uncertain and provide the most information.
+        
+        If set_boundary_through(x0) was called and x0_start is provided for
+        method='optimize', uses local minimization from x0_start so the returned
+        point lies on the boundary near that point (e.g. near the incumbent).
         
         Parameters:
         -----------
@@ -223,18 +264,27 @@ class NonLinearLogisticRegression:
             Method to use: 'grid_search', 'random', or 'optimize'
         random_state : int or None, default=None
             Random seed for reproducibility
+        x0_start : array-like, shape (n_features,), optional
+            For method='optimize': if provided, run local minimization from this
+            point instead of global search, so the result is on the boundary near x0_start.
+        target_probability : float, default=0.5
+            Target probability contour to match. Use 0.5 for classic boundary,
+            or e.g. 0.8 for a more exploitative class-1 region.
             
         Returns:
         --------
         next_point : array, shape (n_features,)
             Next point to evaluate (closest to decision boundary)
         uncertainty : float
-            Distance from decision boundary (|prob - 0.5|)
+            Distance from target contour (|prob - target_probability|)
         probability : float
             Predicted probability at this point
         """
         bounds = np.array(bounds)
         n_features = bounds.shape[0]
+        target_probability = float(target_probability)
+        if not (0.0 < target_probability < 1.0):
+            raise ValueError("target_probability must be in (0, 1).")
         
         if random_state is not None:
             np.random.seed(random_state)
@@ -260,22 +310,34 @@ class NonLinearLogisticRegression:
             def objective(x):
                 x = x.reshape(1, -1)
                 prob = self.predict_proba(x)[0, 1]  # Probability of class 1
-                # Minimize distance from 0.5 (decision boundary)
-                return abs(prob - 0.5)
+                # Minimize distance from target contour
+                return abs(prob - target_probability)
             
-            # Use differential evolution for global optimization
-            result = differential_evolution(
-                objective,
-                bounds=list(bounds),
-                seed=random_state,
-                maxiter=100,
-                popsize=15,
-                atol=1e-6,
-            )
+            if x0_start is not None:
+                # Local search from x0_start so we get a point on the boundary near it
+                x0 = np.asarray(x0_start, dtype=float).ravel()
+                x0 = np.clip(x0, bounds[:, 0], bounds[:, 1])
+                result = minimize(
+                    objective,
+                    x0=x0,
+                    bounds=list(bounds),
+                    method="L-BFGS-B",
+                )
+                next_point = result.x
+            else:
+                # Global search
+                result = differential_evolution(
+                    objective,
+                    bounds=list(bounds),
+                    seed=random_state,
+                    maxiter=100,
+                    popsize=15,
+                    atol=1e-6,
+                )
+                next_point = result.x
             
-            next_point = result.x
             prob = self.predict_proba(next_point.reshape(1, -1))[0, 1]
-            uncertainty = abs(prob - 0.5)
+            uncertainty = abs(prob - target_probability)
             
             return next_point, uncertainty, prob
             
@@ -285,8 +347,8 @@ class NonLinearLogisticRegression:
         # Evaluate all candidates
         probabilities = self.predict_proba(candidates)[:, 1]
         
-        # Find point closest to decision boundary (prob = 0.5)
-        uncertainties = np.abs(probabilities - 0.5)
+        # Find point closest to target contour
+        uncertainties = np.abs(probabilities - target_probability)
         best_idx = np.argmin(uncertainties)
         
         next_point = candidates[best_idx]

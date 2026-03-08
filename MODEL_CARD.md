@@ -49,7 +49,7 @@ This model card describes the Black-Box Optimization (BBO) approach used in the 
 **Implementation**
 
 - **Scripts**: `scripts/bayesian_optimisation/` (EI, exploitative, noise-aware), `scripts/logistic_regression/`, `scripts/neural_networks/pytorch_simple_nn_next_point.py`, `scripts/utils/data_utils.py`.
-- **Notebooks**: Weekly analysis and next-point generation in `weeklyWork/weekN/` (e.g. function1_nonlinear_logistic_regression, function2_bayesian_validation, function7_8_pytorch_gradient_optimization). Results (e.g. next point, method name, hyperparameters) are stored in `weeklyWork/weekN/results/function_k_next_point.json`.
+- **Notebooks**: Weekly analysis and next-point generation in `weeklyWork/weekN/` (e.g. function1_nonlinear_logistic_regression, function2_local_trust_region_bo, function3_noise_aware_exploitative_bo, function7_8_pytorch_gradient_optimization). Results (e.g. next point, method name, hyperparameters) are stored in `weeklyWork/weekN/results/function_k_next_point.json`.
 
 ---
 
