@@ -1,0 +1,26 @@
+digraph {
+	x1 [label=x1 color=lightblue shape=circle style=filled]
+	x2 [label=x2 color=lightblue shape=circle style=filled]
+	x3 [label=x3 color=lightblue shape=circle style=filled]
+	h1 [label=h1 color=orange shape=circle style=filled]
+	h2 [label=h2 color=orange shape=circle style=filled]
+	h3 [label=h3 color=orange shape=circle style=filled]
+	h4 [label=h4 color=orange shape=circle style=filled]
+	y [label=output color=lightgreen shape=circle style=filled]
+	x1 -> h1
+	x1 -> h2
+	x1 -> h3
+	x1 -> h4
+	x2 -> h1
+	x2 -> h2
+	x2 -> h3
+	x2 -> h4
+	x3 -> h1
+	x3 -> h2
+	x3 -> h3
+	x3 -> h4
+	h1 -> y
+	h2 -> y
+	h3 -> y
+	h4 -> y
+}
