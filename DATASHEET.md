@@ -8,7 +8,7 @@ This datasheet documents the dataset used for the Black-Box Optimization (BBO) c
 
 **Why was this dataset created?**
 
-The dataset was created to support a **course-based black-box optimization challenge**. The primary task is to **maximise the output** of eight unknown, expensive-to-evaluate functions with very limited queries (approximately one submission per function per week over 10 weeks, i.e. ~80 total evaluations across all functions).
+The dataset was created to support a **course-based black-box optimization challenge**. The primary task is to **maximise the output** of eight unknown, expensive-to-evaluate functions with very limited queries (approximately one submission per function per week over 12 weeks, i.e. ~96 total evaluations across all functions).
 
 **What task does it support?**
 

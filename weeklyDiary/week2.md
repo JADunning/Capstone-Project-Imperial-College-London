@@ -16,7 +16,7 @@ I focused more on exploration, because we're only in week 2 and we only have 11 
 
 #### Have any participant strategies, class discussions or recent outputs influenced how you approached this week's submission?
 
-The Bayesien Optimisation classes influenced my approach, especially the discussion around when to switch between exploration and exploitation. Since we have 10 weeks and 10 submissions, it makes sense to use at least 3 on exploration before trying to exploit anything.
+The Bayesien Optimisation classes influenced my approach, especially the discussion around when to switch between exploration and exploitation. Since we have 12 weeks and 12 submissions, it makes sense to use at least 3 on exploration before trying to exploit anything.
 
 
 

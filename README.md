@@ -46,7 +46,7 @@ This project directly applies to my career goals in data science and machine lea
 Documentation for reproducibility and transparency (Mini-lessons 21.1 and 21.2):
 
 - **[Datasheet](DATASHEET.md)** — Documents the BBO capstone dataset: motivation, composition, collection process, preprocessing, intended/inappropriate uses, and distribution/maintenance.
-- **[Model Card](MODEL_CARD.md)** — Describes the optimisation approach: overview, intended use, strategy across the ten rounds, performance summary, assumptions and limitations, and ethical considerations.
+- **[Model Card](MODEL_CARD.md)** — Describes the optimisation approach: overview, intended use, strategy across the twelve rounds, performance summary, assumptions and limitations, and ethical considerations.
 
 
 ## 4. Inputs and Outputs
@@ -93,11 +93,11 @@ output = 0.427  # Higher is better (maximization)
 
 ### Primary Goal
 
-**Maximize the output** of eight black-box functions with minimal function evaluations. The competition runs for 10 weeks with approximately **1 query per function per week** (~80 total queries across all functions).
+**Maximize the output** of eight black-box functions with minimal function evaluations. The competition runs for 12 weeks with approximately **1 query per function per week** (~96 total queries across all functions).
 
 ### Constraints and Limitations
 
-1. **Limited Queries**: Only ~10 evaluations per function over the entire project duration
+1. **Limited Queries**: Only ~12 evaluations per function over the entire project duration
 2. **Unknown Function Structure**: 
    - May contain multiple local optima
    - May have discontinuities or flat regions
@@ -109,7 +109,7 @@ output = 0.427  # Higher is better (maximization)
 
 This section documents my evolving optimization strategy across the first three weeks of submissions. The approach emphasizes **early exploration** before transitioning to **exploitation** in later weeks.
 
-### Overall Strategy (10-Week Plan)
+### Overall Strategy (12-Week Plan)
 
 **Weeks 1-3: Exploration Phase**
 - Focus on sampling diverse regions of the input space
@@ -121,11 +121,28 @@ This section documents my evolving optimization strategy across the first three 
 - Tune surrogate model hyperparameters
 - Experiment with different functions
 
-**Weeks 7-10: Exploitation Phase**
+**Weeks 7-12: Exploitation Phase**
 - Focus on refining best-known regions
 - Consider function-specific strategies (e.g., logistic regression for Function 1)
 - Potentially employ neural networks for high-dimensional functions (7, 8)
 
+### Weekly strategy documents
+
+Week-by-week notes on what changed from the previous week (method, visualisation, and why) are in the strategy documents below. Each describes differences from the prior week and includes an **Overall method and visualisation** section (e.g. when t-SNE was introduced, when the results table with distance to the best point was added).
+
+| Week | Strategy document |
+|------|-------------------|
+| 1 | [week1_strategy.md](weeklyWork/week1/week1_strategy.md) |
+| 2 | [week2_strategy.md](weeklyWork/week2/week2_strategy.md) |
+| 3 | [week3_strategy.md](weeklyWork/week3/week3_strategy.md) |
+| 4 | [week4_strategy.md](weeklyWork/week4/week4_strategy.md) |
+| 5 | [week5_strategy.md](weeklyWork/week5/week5_strategy.md) |
+| 6 | [week6_strategy.md](weeklyWork/week6/week6_strategy.md) |
+| 7 | [week7_strategy.md](weeklyWork/week7/week7_strategy.md) |
+| 8 | [week8_strategy.md](weeklyWork/week8/week8_strategy.md) |
+| 9 | [week9_strategy.md](weeklyWork/week9/week9_strategy.md) |
+| 10 | [week10_strategy.md](weeklyWork/week10/week10_strategy.md) |
+| 11 | [week11_strategy.md](weeklyWork/week11/week11_strategy.md) |
 
 ---
 
@@ -178,10 +195,18 @@ pip install -r requirements.txt
 ├── weeklyDiary/                       # Weekly reflections
 │   ├── week1.md
 │   ├── week2.md
-│   └── week3.md
-├── week1-*.ipynb                      # Analysis notebooks
+│   └── ...
+├── weeklyWork/                        # Weekly notebooks and strategy docs
+│   ├── week1/
+│   │   ├── week1_strategy.md          # Strategy vs previous week (+ viz)
+│   │   └── ...
+│   ├── week2/
+│   ├── ...
+│   └── week11/
+│       └── week11_strategy.md
+├── week1-*.ipynb                      # (Legacy) analysis notebooks
 ├── week2.ipynb
-└── week3.ipynb
+└── ...
 ```
 
 ---

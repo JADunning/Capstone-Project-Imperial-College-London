@@ -7,8 +7,8 @@ This model card describes the Black-Box Optimization (BBO) approach used in the 
 ## 1. Overview
 
 - **Name**: BBO Capstone Optimisation Strategy (function-specific surrogates and acquisition).
-- **Type**: Suite of surrogate-based optimisation methods; not a single fixed “model” but a **strategy** that selects different techniques per function and evolves over the 10 rounds.
-- **Version**: As of the latest submission (e.g. week 8–10): logistic regression (Function 1), GP + UCB/EI (Functions 2, 4, 5, 6), noise-aware GP (Function 3), PyTorch MLP + gradient optimisation (Functions 7, 8). Versioning is implicit in the weekly notebooks and `scripts/` (e.g. `bayesian_optimization_ei.py`, `bayesian_optimization_exploitative.py`, `bayesian_optimization_noise.py`, `pytorch_simple_nn_next_point.py`).
+- **Type**: Suite of surrogate-based optimisation methods; not a single fixed “model” but a **strategy** that selects different techniques per function and evolves over the 12 rounds.
+- **Version**: As of the latest submission (e.g. week 8–12): logistic regression (Function 1), GP + UCB/EI (Functions 2, 4, 5, 6), noise-aware GP (Function 3), PyTorch MLP + gradient optimisation (Functions 7, 8). Versioning is implicit in the weekly notebooks and `scripts/` (e.g. `bayesian_optimization_ei.py`, `bayesian_optimization_exploitative.py`, `bayesian_optimization_noise.py`, `pytorch_simple_nn_next_point.py`).
 
 ---
 
@@ -35,7 +35,7 @@ This model card describes the Black-Box Optimization (BBO) approach used in the 
 
 - **Rounds 1–3 (exploration)**: Broad sampling across the input space to build initial surrogates and understand function behaviour.
 - **Rounds 4–6 (transition)**: More exploitation (e.g. β=0 UCB), introduction of progress validation (flagging when the incumbent does not improve), noise-aware BO for Function 3, and gradient-based next-point suggestion for Functions 7 and 8.
-- **Rounds 7–10 (exploitation and refinement)**: Focus on refining around best-known regions; for functions where exploitative BO drifted or plateaued, switch to **Expected Improvement (EI)** to balance exploration and exploitation (week 10). Continued use of logistic regression (Function 1), noise-aware BO (Function 3), and NN + gradient (Functions 7, 8).
+- **Rounds 7–12 (exploitation and refinement)**: Focus on refining around best-known regions; for functions where exploitative BO drifted or plateaued, switch to **Expected Improvement (EI)** to balance exploration and exploitation (week 10). Continued use of logistic regression (Function 1), noise-aware BO (Function 3), and NN + gradient (Functions 7, 8).
 
 **Techniques by function**
 
