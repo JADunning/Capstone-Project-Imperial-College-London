@@ -8,7 +8,7 @@ This model card describes the Black-Box Optimization (BBO) approach used in the 
 
 - **Name**: BBO Capstone Optimisation Strategy (function-specific surrogates and acquisition).
 - **Type**: Suite of surrogate-based optimisation methods; not a single fixed “model” but a **strategy** that selects different techniques per function and evolves over the 12 rounds.
-- **Version**: As of the latest submission (e.g. week 8–12): logistic regression (Function 1), GP + UCB/EI (Functions 2, 4, 5, 6), noise-aware GP (Function 3), PyTorch MLP + gradient optimisation (Functions 7, 8). Versioning is implicit in the weekly notebooks and `scripts/` (e.g. `bayesian_optimization_ei.py`, `bayesian_optimization_exploitative.py`, `bayesian_optimization_noise.py`, `pytorch_simple_nn_next_point.py`).
+- **Version**: Final documented repository state: logistic regression (Function 1), GP + UCB/EI and local trust-region variants (Functions 2, 4, 5, 6), noise-aware GP (Function 3), and PyTorch MLP + gradient optimisation (Functions 7, 8). Versioning is implicit in the weekly notebooks and `scripts/` (e.g. `bayesian_optimization_ei.py`, `bayesian_optimization_exploitative.py`, `bayesian_optimization_noise.py`, `pytorch_simple_nn_next_point.py`).
 
 ---
 
@@ -29,20 +29,20 @@ This model card describes the Black-Box Optimization (BBO) approach used in the 
 
 ---
 
-## 3. Details: Strategy Across the Ten Rounds
+## 3. Details: Strategy Across the Project
 
 **High-level evolution**
 
 - **Rounds 1–3 (exploration)**: Broad sampling across the input space to build initial surrogates and understand function behaviour.
 - **Rounds 4–6 (transition)**: More exploitation (e.g. β=0 UCB), introduction of progress validation (flagging when the incumbent does not improve), noise-aware BO for Function 3, and gradient-based next-point suggestion for Functions 7 and 8.
-- **Rounds 7–12 (exploitation and refinement)**: Focus on refining around best-known regions; for functions where exploitative BO drifted or plateaued, switch to **Expected Improvement (EI)** to balance exploration and exploitation (week 10). Continued use of logistic regression (Function 1), noise-aware BO (Function 3), and NN + gradient (Functions 7, 8).
+- **Later rounds (exploitation and refinement)**: Focus on refining around best-known regions; for functions where exploitative BO drifted or plateaued, switch to **Expected Improvement (EI)** or more robust local trust-region BO to balance exploration and exploitation. Continued use of logistic regression (Function 1), noise-aware BO (Function 3), and NN + gradient (Functions 7, 8).
 
 **Techniques by function**
 
 | Function | Dimensions | Technique | Main ingredients |
 |----------|------------|-----------|-------------------|
-| 1 | 2D | Non-linear logistic regression | Polynomial features, binary labels (threshold percentile), grid search over degree/C/threshold; query where P(good) ≈ 0.5. |
-| 2, 4, 5, 6 | 2D–5D | Bayesian optimisation (GP) | GP (RBF kernel), UCB with β=0 (exploitation) or EI when progress stalls; progress validation to refocus. |
+| 1 | 2D | Non-linear logistic regression | Polynomial features, binary labels (threshold percentile), grid search over degree/C/threshold; query near the learned high-value boundary or target contour. |
+| 2, 4, 5, 6 | 2D–5D | Bayesian optimisation (GP) | GP (RBF kernel), UCB with β=0 (exploitation) or EI when progress stalls; later local trust-region BO and progress validation to refocus. |
 | 3 | 3D | Noise-aware BO | GP + WhiteKernel, moderate β, local restarts near incumbent; re-runs for consistency. |
 | 7, 8 | 6D, 8D | Neural network + gradient | PyTorch MLP (e.g. 64 hidden, 1200 epochs), fit to observations; gradient ascent from multiple restarts to suggest next point. |
 
@@ -67,7 +67,7 @@ This model card describes the Black-Box Optimization (BBO) approach used in the 
 
 **Summary across the eight functions**
 
-- Performance varies by function and by round. Functions 1 and 3 have particular structure (sparse/near-binary; noisy), so improvements can be uneven. Functions 5 and 7–8 show diminishing returns as the strategy approaches local/global optima (week 9). The combination of method choice (logistic vs GP vs NN), acquisition (UCB vs EI), and progress validation is intended to improve robustness and steady gains where possible (week 9, 10).
+- Performance varies by function and by round. Functions 1 and 3 have particular structure (sparse/near-binary; noisy), so improvements can be uneven. Functions 5 and 7–8 show diminishing returns as the strategy approaches local/global optima. The combination of method choice (logistic vs GP vs NN), acquisition (UCB vs EI), trust-region refinement, and progress validation is intended to improve robustness and steady gains where possible. The repository’s recorded output files run through week 10, while later notebooks and reflections document the final strategy refinements.
 
 ---
 
@@ -100,4 +100,3 @@ This model card describes the Black-Box Optimization (BBO) approach used in the 
 **Real-world adaptation**
 
 - Making **intended use**, **limitations**, and **failure modes** explicit helps anyone adapting this approach to a different domain (e.g. hyperparameter tuning, drug discovery) to assess fit and risk. Stating assumptions (smoothness, bounded domain, surrogate validity) and inappropriate uses reduces misuse and overconfidence.
-

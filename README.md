@@ -26,6 +26,10 @@ BBO is fundamental to many real-world machine learning and engineering applicati
 
 The key challenge is that **function evaluations are expensive** (limited to ~10 queries per week), and we must be strategic about where to sample to find optimal solutions efficiently.
 
+### For a General Audience
+
+In this project, I had to improve eight unknown systems using only a small number of weekly trials. I could not see the equations behind the systems, so each new test had to be chosen carefully using what previous results suggested. I started by exploring widely, then gradually switched to more targeted methods once I had a better idea of where good results might be. Different functions needed different strategies: simpler models for some, Bayesian optimisation for others, and neural-network surrogates for the highest-dimensional cases. Overall, the project shows how structured experimentation can improve results even when data are limited and the system is mostly unknown.
+
 ### Project Presentation
 
 A structured **project presentation** covering the BBO approach, strategy evolution, patterns and insights, decision-making, and next steps is available here:
@@ -107,28 +111,37 @@ output = 0.427  # Higher is better (maximization)
 
 ## 6. Technical Approach
 
-This section documents my evolving optimization strategy across the first three weeks of submissions. The approach emphasizes **early exploration** before transitioning to **exploitation** in later weeks.
+This repository documents the completed optimisation workflow used across the capstone project. The strategy began with broad exploration, then became increasingly function-specific as more data were collected and the behaviour of each function became clearer.
 
-### Overall Strategy (12-Week Plan)
+### Final Strategy Summary
 
-**Weeks 1-3: Exploration Phase**
+**Early phase: exploration**
 - Focus on sampling diverse regions of the input space
 - Build understanding of function behavior across all dimensions
 - Collect data for training surrogate models
 
-**Weeks 4-6: Transition Phase**
-- Begin incorporating exploitation near promising regions
-- Tune surrogate model hyperparameters
-- Experiment with different functions
+**Middle phase: transition to function-specific methods**
+- Move from a single shared BO workflow toward methods matched to each function
+- Introduce logistic regression for Function 1 and neural-network surrogates for Functions 7 and 8
+- Add tuning, diagnostics, and progress checks as more weekly data become available
 
-**Weeks 7-12: Exploitation Phase**
-- Focus on refining best-known regions
-- Consider function-specific strategies (e.g., logistic regression for Function 1)
-- Potentially employ neural networks for high-dimensional functions (7, 8)
+**Later phase: refinement and validation**
+- Refine around best-known regions using exploitative or noise-aware Bayesian optimisation
+- Add results tables, distance-to-incumbent checks, and progress summaries to identify stalled functions
+- Use more robust local trust-region BO for functions where the earlier GP setup drifted or became unstable
+
+### Final Method by Function
+
+| Function | Final/main approach |
+|----------|---------------------|
+| Function 1 | Non-linear logistic regression with polynomial features to identify the high-value boundary region |
+| Functions 2, 4, 5, 6 | Gaussian-process Bayesian optimisation, later refined with validation and local trust-region variants where needed |
+| Function 3 | Noise-aware Bayesian optimisation with explicit handling of noisy observations |
+| Functions 7, 8 | PyTorch MLP surrogate with gradient-based optimisation from multiple restarts |
 
 ### Weekly strategy documents
 
-Week-by-week notes on what changed from the previous week (method, visualisation, and why) are in the strategy documents below. Each describes differences from the prior week and includes an **Overall method and visualisation** section (e.g. when t-SNE was introduced, when the results table with distance to the best point was added).
+Week-by-week notes on what changed from the previous week (method, visualisation, and why) are in the strategy documents below. Each describes differences from the prior week and includes an **Overall method and visualisation** section. The repository contains strategy documents through week 11, with later reflections and presentation material summarising the completed project.
 
 | Week | Strategy document |
 |------|-------------------|
@@ -190,8 +203,8 @@ pip install -r requirements.txt
 ├── data/                              # Query data by week
 │   ├── initial_data/
 │   ├── week1/
-│   ├── week2/
-│   └── week3/
+│   ├── ...
+│   └── week10/
 ├── weeklyDiary/                       # Weekly reflections
 │   ├── week1.md
 │   ├── week2.md
@@ -204,9 +217,9 @@ pip install -r requirements.txt
 │   ├── ...
 │   └── week11/
 │       └── week11_strategy.md
-├── week1-*.ipynb                      # (Legacy) analysis notebooks
-├── week2.ipynb
-└── ...
+├── PROJECT_PRESENTATION.md            # Final presentation-style project summary
+├── MODEL_CARD.md                      # Model transparency and limitations
+└── DATASHEET.md                       # Dataset motivation, structure, and caveats
 ```
 
 ---
@@ -225,4 +238,4 @@ pip install -r requirements.txt
 Imperial College London  
 MSc Machine Learning
 
-*This README is a living document and will be updated as the project progresses.*
+*This README summarises the completed BBO capstone repository for assessment and portfolio use.*
